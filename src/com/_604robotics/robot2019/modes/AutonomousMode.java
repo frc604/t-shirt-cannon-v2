@@ -33,7 +33,7 @@ public class AutonomousMode extends Coordinator {
 
 	public String primaryFileName;
 	public String secondaryFileName;
-	
+
 
 
 	public static enum PathFollowSide {
@@ -179,7 +179,7 @@ public class AutonomousMode extends Coordinator {
 	private class FallBackMacro extends StatefulCoordinator {
 		public FallBackMacro() {
 			super(FallBackMacro.class);
-			
+
 			//addState("Pathfind back 144in", new PathStraight( PathFinderUtil.inchesToMeters( 144 ), true ));
 		}
 	}
@@ -187,7 +187,7 @@ public class AutonomousMode extends Coordinator {
 	private class FallForwardMacro extends StatefulCoordinator {
 		public FallForwardMacro() {
 			super(FallForwardMacro.class);
-			
+
 			//addState("Pathfind forward 144in", new PathStraight( PathFinderUtil.inchesToMeters( 144 ) ));
 		}
 	}
@@ -227,7 +227,7 @@ public class AutonomousMode extends Coordinator {
 
 			@Override
 			public double pidGet() {
-				return -robot.drive.rightClicks.get()+robot.drive.leftClicks.get();
+				return 0.0; //-robot.drive.rightClicks.get()+robot.drive.leftClicks.get();
 			}
 		};
 		// Encoder moving PIDSource
@@ -243,7 +243,7 @@ public class AutonomousMode extends Coordinator {
 
 			@Override
 			public double pidGet() {
-				return (robot.drive.rightClicks.get()+robot.drive.leftClicks.get())/2;
+				return 0.0;//(robot.drive.rightClicks.get()+robot.drive.leftClicks.get())/2;
 			}
 
 		};

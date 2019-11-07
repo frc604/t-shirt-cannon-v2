@@ -119,6 +119,7 @@ public class PowerMonitor extends Module {
                 timerArray[i].reset();
             }
         }
+        
         if (batteryVoltage.get()<voltageLimit) {
             voltagePulse.update(true);
             voltageTimer.startIfNotRunning();
@@ -133,6 +134,7 @@ public class PowerMonitor extends Module {
             }
             voltageTimer.reset();
         }
+        
     }
 
     protected void end() {

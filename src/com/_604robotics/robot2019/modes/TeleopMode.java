@@ -7,7 +7,6 @@ import com._604robotics.marionette.MarionetteJoystick;
 import com._604robotics.robot2019.constants.Calibration;
 import com._604robotics.robot2019.modules.Arm;
 import com._604robotics.robot2019.modules.Drive;
-import com._604robotics.robot2019.modules.Intake;
 import com._604robotics.robotnik.Coordinator;
 import com._604robotics.robotnik.Logger;
 import com._604robotics.robotnik.prefabs.controller.ExtendablePIDController;
@@ -37,8 +36,8 @@ public class TeleopMode extends Coordinator {
     private final DriveManager driveManager;
     //private final ArmManager armManager;
     //private final IntakeManager intakeManager;
-    private final HatchManager hatchManager;
-    private final AutoCenterManager autoCenterManager;
+    private final CanisterManager canisterManager;
+    //private final AutoCenterManager autoCenterManager;
 
     private final Logger test = new Logger("Teleop");
 
@@ -73,8 +72,8 @@ public class TeleopMode extends Coordinator {
         driveManager = new DriveManager();
         //armManager = new ArmManager();
         //intakeManager = new IntakeManager();
-        hatchManager = new HatchManager();
-        autoCenterManager = new AutoCenterManager();
+        canisterManager = new CanisterManager();
+        //autoCenterManager = new AutoCenterManager();
     }
 
     //<editor-fold desc="Getting Controller Values"
@@ -241,9 +240,9 @@ public class TeleopMode extends Coordinator {
 		System.out.println("DriveManager running");
         //armManager.run();
         //intakeManager.run();
-        hatchManager.run();
+        canisterManager.run();
     }
-	
+
 	public double getDriverLeftStickY() {
 		return driverLeftJoystickY;
 	}
@@ -312,97 +311,29 @@ public class TeleopMode extends Coordinator {
                     System.out.println("Current value is:"+robot.dashboard.driveMode.get());
             }
 
-            if( driverRightBumper ){
-                robot.limelight.scan.activate();
-                arcade.activate();
-
-                if( robot.limelight.limelightHasTargets.get() ){
+            switch( currentDrive ) {
+                case IDLE:
+                    idle.activate();
+                    break;
+                case ARCADE:
                     arcade.movePower.set(leftY);
-                    autoCenterManager.run();
-                } else {
-                    robot.limelight.scan.activate();
-                    switch( currentDrive ) {
-                        case IDLE:
-                            idle.activate();
-                            break;
-                        case ARCADE:
-                            arcade.movePower.set(leftY);
-                            if( driverLeftJoystickButton ) {
-                                arcade.rotatePower.set(rightX * Calibration.SLOW_ROTATION_MODIFIER);
-                            } else {
-                                arcade.rotatePower.set(rightX);
-                            }
-                            arcade.activate();
-                            break;
-                        case TANK:
-                            tank.leftPower.set(leftY);
-                            tank.rightPower.set(rightY);
-                            tank.activate();
-                            break;
+                    if( driverLeftJoystickButton ) {
+                        arcade.rotatePower.set(rightX * Calibration.SLOW_ROTATION_MODIFIER);
+                    } else {
+                        arcade.rotatePower.set(rightX);
                     }
-                }
-            } else {
-                autoCenterManager.end();
-
-                switch(robot.dashboard.limelightVisionMode.get()){
-                    case DRIVER:
-                        robot.limelight.driver.activate();
-                        break;
-                    case VISION:
-                        robot.limelight.scan.activate();
-                        break;
-                    default:
-                        robot.limelight.scan.activate();
-                }
-
-                switch( currentDrive ) {
-                    case IDLE:
-                        idle.activate();
-                        break;
-                    case ARCADE:
-                        arcade.movePower.set(leftY);
-                        if( driverLeftJoystickButton ) {
-                            arcade.rotatePower.set(rightX * Calibration.SLOW_ROTATION_MODIFIER);
-                        } else {
-                            arcade.rotatePower.set(rightX);
-                        }
-                        arcade.activate();
-                        break;
-                    case TANK:
-                        tank.leftPower.set(leftY);
-                        tank.rightPower.set(rightY);
-                        tank.activate();
-                        break;
-                }
+                    arcade.activate();
+                    break;
+                case TANK:
+                    tank.leftPower.set(leftY);
+                    tank.rightPower.set(rightY);
+                    tank.activate();
+                    break;
             }
         }
     }
 
-    /*private class IntakeManager {
-        private final Intake.Idle idle;
-        private final Intake.Speed speed;
-
-        public IntakeManager() {
-            idle = robot.intake.new Idle();
-            speed = robot.intake.new Speed();
-        }
-
-        public void run() {
-            if( driverLeftTrigger != 0.0 ) {
-                speed.set(driverLeftTrigger); // Intake
-            } else if( driverRightTrigger != 0.0 ){
-                speed.set(-1*driverRightTrigger); // Outtake
-            } else if( manipLeftTrigger != 0.0 ) {
-                speed.set(manipLeftTrigger); // Intake
-            } else if( manipRightTrigger != 0 ) {
-                speed.set(-1*manipRightTrigger); // Outtake
-            } else {
-                idle.activate();
-            }
-        }
-    }*/
-
-    /*private class ArmManager {
+    private class ArmManager {
         private Arm arm;
 
         public ArmManager() {
@@ -410,154 +341,40 @@ public class TeleopMode extends Coordinator {
         }
 
         public void run() {
-            // Check setpoints
-            if( manipA ) {
-                // Low position
-                arm.setpoint.setpoint.set(Calibration.Arm.LOW_SETPOINT);
-                arm.setpoint.activate();
-            } else if( manipY ) {
-                // Ball place position
-                arm.setpoint.setpoint.set(Calibration.Arm.OUTPUT_SETPOINT);
-                arm.setpoint.activate();
-            } else if( manipB ) {
-                // Hatch place position (stow)
-                arm.setpoint.setpoint.set(Calibration.Arm.STOW_SETPOINT);
-                arm.setpoint.activate();
-            } else {
-                // Check thumbsticks
-                if( manipLeftJoystickY != 0 ) {
-                    // Set arm rate to joystick
-                    double motorValue = manipLeftJoystickY * Calibration.Arm.SCALE_JOYSTICK;
-
-                    // Calculate needed factor for torque
-                    double angle = 2*Math.PI * arm.redundantEncoderClicks.get()/Calibration.Arm.CLICKS_FULL_ROTATION;
-                    angle = Math.cos(angle);
-
-                    if( (motorValue < 0 && arm.redundantEncoderClicks.get() < Calibration.Arm.VERTICAL_POSITION) ||
-                        (motorValue > 0 && arm.redundantEncoderClicks.get() > Calibration.Arm.VERTICAL_POSITION) ) {
-                        // We need to account for gravity existing
-                        motorValue += Calibration.Arm.kF * angle;
-                    }
-
-                    arm.move.inputPower.set(motorValue);
-                    arm.move.activate();
-                } else {
-                    // Hold arm still
-                    arm.hold.activate();
-                }
-            }
-
-        }
-    }*/
-
-    private class HatchManager {
-        //private Toggle useAuto;
-        //private Toggle hookToggle;
-        private Toggle sliderForward;
-        //private Timer hatchTime;
-
-        public HatchManager() {
-            //useAuto = new Toggle(true);
-           //hookToggle = new Toggle(true); // Assuming the piston is in the held state to start
-            sliderForward = new Toggle(false); // Not extended initially
-            //hatchTime = new Timer();
-        }
-
-        public void run() {
-            /*
-            useAuto.update(manipStart);
-            if( useAuto.isInOnState() ) {
-                // Checks if the two limit switches are pressed, meaning the hatch is ready to deploy
-                hookToggle.update(manipRightBumper || robot.hook.aligned.get());
-            } else {
-                // Ignore the limit switches, only use the controller
-                hookToggle.update(manipRightBumper);
-            }
-            
-            // Toggle placer state
-            if( hookToggle.isInOnState() ) {
-                robot.hook.release.activate();
-                robot.pusher.push.activate();
-                hatchTime.start();
-            } else if( hookToggle.isInOffState() ) {
-                robot.hook.hold.activate();
-                robot.pusher.pullBack.activate();
-                hatchTime.stop();
-                hatchTime.reset();
-            }
-
-            // Check if we need to pull back the pusher
-            if( hatchTime.hasPeriodPassed(Calibration.PUSH_TIME) ) {
-                robot.pusher.pullBack.activate();
-                hatchTime.stop();
-                hatchTime.reset();
-            }
-            
-            if( manipLeftBumper ) {
-                robot.pusher.push.activate();
-            } else {
-                robot.pusher.pullBack.activate();
-            }*/
-
-            // Slide forward and back
-            sliderForward.update(driverB);
-
-
-            System.out.println("HatchMnanger");
-
-            if( sliderForward.isInOnState() ) {
-                robot.slider.front.activate();
-            } else if( sliderForward.isInOffState() ) {
-                robot.slider.back.activate();
-            }
+            arm.move.inputPower.set(manip.rightStick.y.get());
+            arm.move.activate();
         }
     }
 
-    private class AutoCenterManager {
-        private ExtendablePIDController anglePID;
-        private ExtendablePIDController distPID;
-        private PIDOutput rotation;
-        private PIDOutput drive;
+    private class CanisterManager {
+        private Toggle lockToggle;
+        private Toggle pushToggle;
 
-        public AutoCenterManager() {
-            rotation = new PIDOutput() {
-                @Override
-                public synchronized void pidWrite(double output) {
-                    if( output >= 0.535 ) {
-                        output = 0.535;
-                    } else if( output <= -0.535 ) {
-                        output = -0.535;
-                    }
-                    driveManager.arcade.rotatePower.set(output);
-                }
-            };
-            drive = new PIDOutput() {
-                @Override
-                public synchronized void pidWrite(double output) {
-                    driveManager.arcade.movePower.set(output);
-                }
-            };
-            anglePID = new ExtendablePIDController(-0.055, 0, -0.3, new Limelight.HorizontalError(robot.limelight,0), rotation, 0.025);
-            anglePID.setAbsoluteTolerance(Calibration.LIMELIGHT_ANGLE_TOLERANCE);
-            distPID = new ExtendablePIDController(0.5, 0, 0, new Limelight.DistanceError(robot.limelight, 18), drive);
-            distPID.setAbsoluteTolerance(Calibration.LIMELIGHT_DIST_TOLERANCE);
+        public CanisterManager() {
+            lockToggle = new Toggle(true);
+            pushToggle = new Toggle(true);
         }
 
         public void run() {
-
-            robot.limelight.scan.activate();
-            if( robot.limelight.limelightHasTargets.get() ) {
-                anglePID.setEnabled(true);
-				System.out.println(anglePID.get());
-            } else {
-                this.end();
+            lockToggle.update(driverA);
+            // Toggle placer state
+            if( lockToggle.isInOnState() ) {
+                robot.canisterLocker.lock.activate();
+            } else if( lockToggle.isInOffState() ) {
+                robot.canisterLocker.unlock.activate();
             }
-        }
 
-        public void end() {
-            anglePID.setEnabled(false);
-            anglePID.reset();
-            distPID.setEnabled(false);
+            if( driverB ){
+                robot.canisterPusher.push.activate();
+            } else {
+                robot.canisterPusher.retract.activate();
+            }
+
+            if( driverX ){
+                robot.sprinkler.on.activate();
+            } else {
+                robot.sprinkler.off.activate();
+            }
         }
     }
 
@@ -565,3 +382,4 @@ public class TeleopMode extends Coordinator {
         IDLE, ARCADE, TANK
     }
 }
+

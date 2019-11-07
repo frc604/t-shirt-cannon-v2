@@ -1,60 +1,38 @@
 package com._604robotics.robot2019.modules;
 
-import com._604robotics.robot2019.constants.Calibration;
 import com._604robotics.robot2019.constants.Ports;
 import com._604robotics.robotnik.Action;
 import com._604robotics.robotnik.Input;
 import com._604robotics.robotnik.Module;
 import com._604robotics.robotnik.Output;
-import com._604robotics.robotnik.prefabs.devices.wrappers.RampMotor;
 
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
-import edu.wpi.first.wpilibj.CounterBase;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drive extends Module {
-    private final RampMotor m_frontLeft = new RampMotor(new PWMVictorSPX(Ports.DRIVE_FRONT_LEFT_MOTOR),Calibration.DRIVE_MOTOR_RAMP);
-    private final RampMotor m_rearLeft = new RampMotor(new PWMVictorSPX(Ports.DRIVE_REAR_LEFT_MOTOR),Calibration.DRIVE_MOTOR_RAMP);
+    private final VictorSP m_frontLeft = new VictorSP(Ports.DRIVE_FRONT_LEFT_MOTOR);
+    private final VictorSP m_rearLeft = new VictorSP(Ports.DRIVE_REAR_LEFT_MOTOR);
     private final SpeedControllerGroup m_left = new SpeedControllerGroup(m_frontLeft, m_rearLeft);
 
-    private final RampMotor m_frontRight = new RampMotor(new PWMVictorSPX(Ports.DRIVE_FRONT_RIGHT_MOTOR),Calibration.DRIVE_MOTOR_RAMP);
-    private final RampMotor m_rearRight = new RampMotor(new PWMVictorSPX(Ports.DRIVE_REAR_RIGHT_MOTOR),Calibration.DRIVE_MOTOR_RAMP);
+
+    private final VictorSP m_frontRight = new VictorSP(Ports.DRIVE_FRONT_RIGHT_MOTOR);
+    private final VictorSP m_rearRight = new VictorSP(Ports.DRIVE_REAR_RIGHT_MOTOR);
     private final SpeedControllerGroup m_right = new SpeedControllerGroup(m_frontRight, m_rearRight);
 
     DifferentialDrive robotDrive = new DifferentialDrive(m_left, m_right);
 
-    // Reversed from previously due to new mountings
-    private final Encoder encoderLeft = new Encoder(Ports.ENCODER_LEFT_A,
-            Ports.ENCODER_LEFT_B,
-            false,
-            CounterBase.EncodingType.k4X);
-    private final Encoder encoderRight = new Encoder(Ports.ENCODER_RIGHT_A,
-            Ports.ENCODER_RIGHT_B,
-            true,
-            CounterBase.EncodingType.k4X);
-    
+
     private final BuiltInAccelerometer accel = new BuiltInAccelerometer();
     public final Output<Double> xAccel = addOutput("X accel",accel::getX);
     public final Output<Double> yAccel = addOutput("Y accel",accel::getY);
     public final Output<Double> zAccel = addOutput("Z accel",accel::getZ);
     //private final AnalogGyro horizGyro=new AnalogGyro(Ports.HORIZGYRO);
-    
+
     public synchronized void resetSensors() {
-        encoderLeft.reset();
-        encoderRight.reset();
-        //horizGyro.reset();
     }
 
-    //public final Output<Double> gyroAngle = addOutput("gyroAngle",horizGyro::getAngle);
-    public final Output<Integer> leftClicks = addOutput("leftClicks", encoderLeft::get);
-    public final Output<Integer> rightClicks = addOutput("rightClicks", encoderRight::get);
-    
-    public final Output<Double> leftClickRate = addOutput("leftClickRate", encoderLeft::getRate);
-    public final Output<Double> rightClickRate = addOutput("rightClickRate", encoderRight::getRate);
 
     public class Idle extends Action {
         public Idle () {
@@ -77,7 +55,7 @@ public class Drive extends Module {
         public TankDrive () {
             this(0, 0, true);
         }
-        
+
         public TankDrive (boolean squared) {
             this(0, 0, squared);
         }
@@ -91,7 +69,7 @@ public class Drive extends Module {
             // Make these inputs persistent for auton code
             leftPower = addInput("leftPower", defaultLeftPower, true);
             rightPower = addInput("rightPower", defaultRightPower, true);
-            this.squared = squared; 
+            this.squared = squared;
         }
 
         @Override
@@ -111,7 +89,7 @@ public class Drive extends Module {
         public ArcadeDrive () {
             this(0, 0, true);
         }
-        
+
         public ArcadeDrive (boolean squared) {
             this(0, 0, squared);
         }
@@ -133,7 +111,7 @@ public class Drive extends Module {
             robotDrive.arcadeDrive(movePower.get(), rotatePower.get(), squared);
         }
     }
-    
+
     public Drive () {
         super(Drive.class);
         robotDrive.setDeadband(0.04);

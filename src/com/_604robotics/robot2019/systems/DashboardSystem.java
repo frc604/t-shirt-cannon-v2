@@ -12,10 +12,6 @@ public class DashboardSystem extends Coordinator {
 
     @Override
     public boolean run () {
-        robot.dashboard.leftDriveClicks.set(robot.drive.leftClicks.get());
-        robot.dashboard.rightDriveClicks.set(robot.drive.rightClicks.get());
-        robot.dashboard.leftDriveRate.set(robot.drive.leftClickRate.get());
-        robot.dashboard.rightDriveRate.set(robot.drive.rightClickRate.get());
         robot.dashboard.xAccel.set(robot.drive.xAccel.get());
         robot.dashboard.yAccel.set(robot.drive.yAccel.get());
         robot.dashboard.zAccel.set(robot.drive.zAccel.get());
@@ -24,22 +20,6 @@ public class DashboardSystem extends Coordinator {
         
         //robot.powermonitor.initDashboardSendables();
 
-        /* Limelight Testing */
-        robot.dashboard.limelightTarget.set(robot.limelight.limelightHasTargets.get());
-        robot.dashboard.limelightX.set(robot.limelight.limelightX.get());
-        robot.dashboard.limelightY.set(robot.limelight.limelightY.get());
-        robot.dashboard.limelightArea.set(robot.limelight.limelightArea.get());
-        robot.dashboard.limelightSkew.set(robot.limelight.limelightSkew.get());
-        robot.dashboard.limelightDistance.set(robot.limelight.limelightDistance.get());
-
-        robot.limelight.limelightLED.set(robot.dashboard.limelightLEDState.get().ordinal());
-        robot.limelight.limelightStreamMode.set(robot.dashboard.limelightStreamMode.get().ordinal());
-        robot.limelight.limelightSnapshotEnabled.set(robot.dashboard.limelightSnapshot.get());
-
-        if( robot.limelight.scan.isRunning() ) {
-            robot.limelight.limelightPipeline.set(
-                Math.min(0, Math.max(9, robot.dashboard.limelightPipeline.get().intValue())) );
-        }
 		
 		/* Controller Values */
 		robot.dashboard.driverLeftStickY.set(robot.teleopMode.getDriverLeftStickY());

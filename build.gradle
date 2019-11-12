@@ -52,6 +52,10 @@ deploy {
     }
 }
 
+task wrapper(type: Wrapper) {
+    gradleVersion = '5.0'
+}
+
 // Fat Jar with manifest
 jar {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }

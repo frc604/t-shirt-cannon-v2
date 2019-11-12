@@ -17,8 +17,8 @@ public class Ports {
     public static final int DRIVE_REAR_RIGHT_MOTOR = 8;
 
     /* Arm Motors */
-    public static final int ARM_FRONT_MOTOR = 5;
-    public static final int ARM_REAR_MOTOR = 6;
+    public static final int ARM_FRONT_MOTOR = 3;
+    public static final int ARM_REAR_MOTOR = 9;
 
     /* Canister Control */
     public static final int CANISTER_LOCKER_A = 2;

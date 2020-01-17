@@ -3,35 +3,55 @@ plugins {
     id "java"
     id "eclipse"
     id "idea"
-    id "edu.wpi.first.GradleRIO" version "2019.4.1"
+    id "com.diffplug.gradle.spotless" version "3.26.1"
+    id "edu.wpi.first.GradleRIO" version "2020.1.2"
 }
 
-def TEAM = 604
-def ROBOT_CLASS = "com._604robotics.robot2019.Robot2019"
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
 
+def TEAM = 604
+def ROBOT_CLASS = "com._604robotics.robot2020.Robot2020"
+
+// Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
+// Also defines JUnit 4.
 dependencies {
     compile wpi.deps.wpilib()
+    nativeZip wpi.deps.wpilibJni(wpi.platforms.roborio)
+    nativeDesktopZip wpi.deps.wpilibJni(wpi.platforms.desktop)
+
     compile wpi.deps.vendor.java()
     nativeZip wpi.deps.vendor.jni(wpi.platforms.roborio)
     nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
-    // compile ctre()
-    nativeLib files("lib/rio/libpathfinderjava.so")
-    compile fileTree(include: ['*.jar'], dir: 'lib')
-    simulation "edu.wpi.first.halsim:halsim_lowfi:${wpi.wpilibVersion}:${wpi.platforms.desktop}@zip"
+
+    simulation wpi.deps.sim.gui(wpi.platforms.desktop, false)
+
+    testImplementation('org.junit.jupiter:junit-jupiter:5.5.2')
 }
 
 sourceSets {
     main {
         java {
             srcDirs = ["src"]
+            exclude 'src/com/_604robotics/robotnik/Robot_Old.java'
+            exclude 'src/com/_604robotics/robotnik/prefabs/controller/BangBangController.java'
+            exclude 'src/com/_604robotics/robotnik/prefabs/controller/ExtendablePIDController.java'
+        }
+    }
+
+    test {
+        java {
+            srcDirs = ["test"]
         }
     }
 }
 
+// Define my targets (RoboRIO) and artifacts (deployable files)
+// This is added by GradleRIO's backing project EmbeddedTools.
 deploy {
     targets {
         roboRIO("roborio") {
-            team = frc.getTeamOrDefault(TEAM)
+            team = frc.getTeamOrDefault(604)
             // addresses << '10.6.4.2' // RIO IP Address
         }
     }
@@ -52,11 +72,31 @@ deploy {
     }
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '5.0'
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }
 
-// Fat Jar with manifest
+spotless {
+  java {
+    googleJavaFormat()
+    paddedCell()
+  }
+}
+
+// Maven central needed for JUnit
+repositories {
+    mavenCentral()
+}
+
+// Set this to true to enable desktop support.
+def includeDesktopSupport = true
+
+// Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
+// in order to make them all available at runtime. Also adding the manifest so WPILib
+// knows where to look for our Robot Class.
 jar {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_CLASS)

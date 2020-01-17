@@ -4,12 +4,18 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
         {
             "type": "java",
             "name": "Debug (Launch) - Current File",
             "request": "launch",
             "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Robot2020<FRC-2020>",
+            "request": "launch",
+            "mainClass": "com._604robotics.robot2020.Robot2020",
+            "projectName": "FRC-2020"
         }
     ]
 }

@@ -1,5 +1,19 @@
-# FRC-2019
-604 Quixilver's 2019 Robot Code
+# FRC-2020
+604 Quixilver's 2020 Robot Code
+
+## IMPORTAN
+#### (as of 3/01/2019)
+**Please update the WPILib version on you computer, we cannot use older versions at competition!**
+
+*If you want to be able to image the roboRIO, install the new Update Suite too if you are unsure and have a windows laptop, just install it.*
+
+WPILib : [https://github.com/wpilibsuite/allwpilib/releases]
+
+*Read the information in the github wiki about reinstalling VSCode you probably won't have to do it.*
+
+Update Suite : [http://www.ni.com/download/first-robotics-software-2017/7904/en/]
+
+*Side note : robotRIO firmware version v14 is now required for competitions, and this version of WPILib only works with it.*
 
 ## Setting up WPILib
 More Instructions(If ones below do not work look at this):https://wpilib.screenstepslive.com/s/currentCS/m/java/l/1027503-installing-c-and-java-development-tools-for-frc#windows
@@ -12,7 +26,7 @@ https://github.com/wpilibsuite/allwpilib/releases
   #### Windows
   a. Unzip the file by clicking Extract All
   
-  b. Go into the unziped folder and run WPILibInstaller_Windows64-2019.1.1.exe(If it asks if you trst the app, click `More Info` then `Run`
+  b. Go into the unziped folder and run WPILibInstaller_Windows64-2020.1.2.exe(If it asks if you trst the app, click `More Info` then `Run`
   
   c. Install for All Users
   
@@ -25,7 +39,7 @@ https://github.com/wpilibsuite/allwpilib/releases
   g. Click Execute Install
   
   #### MacOS
-  a. Go to downloads and doubble click on the WPILib_Mac-2019.1.1.tar file.
+  a. Go to downloads and doubble click on the WPILib_Mac-2020.1.2.tar file.
  
  b. Go to https://code.visualstudio.com and download VSCode(Click Download for Mac)
  
@@ -33,37 +47,37 @@ https://github.com/wpilibsuite/allwpilib/releases
  
  d. Drag the `Visual Studio Code.app` into Applications.
  
- e. Open  a new `Terminal` window and type in `mkdir frc2019`(This will make a new folder in your home directory called frc2019)
+ e. Open  a new `Terminal` window and type in `mkdir frc2020`(This will make a new folder in your home directory called frc2020)
  
- f. Then type in `cd frc2019` this will run your terminal commands in that folder(directory)
+ f. Then type in `cd frc2020` this will run your terminal commands in that folder(directory)
  
  g. Now run all of these commands to copy the files, one at a time.
  
  ```
-   cp -R ~/Downloads/WPILib_Mac-2019.1.1/documentation ~/frc2019
+   cp -R ~/Downloads/WPILib_Mac-2020.1.2/documentation ~/frc2020
   
-	cp -R ~/Downloads/WPILib_Mac-2019.1.1/frccode ~/frc2019
+	cp -R ~/Downloads/WPILib_Mac-2020.1.2/frccode ~/frc2020
   
-	cp -R ~/Downloads/WPILib_Mac-2019.1.1/installUtils ~/frc2019
+	cp -R ~/Downloads/WPILib_Mac-2020.1.2/installUtils ~/frc2020
   
-	cp -R ~/Downloads/WPILib_Mac-2019.1.1/jdk ~/frc2019
+	cp -R ~/Downloads/WPILib_Mac-2020.1.2/jdk ~/frc2020
   
-	cp -R ~/Downloads/WPILib_Mac-2019.1.1/jdk-11.0.1.jdk ~/frc2019
+	cp -R ~/Downloads/WPILib_Mac-2020.1.2/jdk-11.0.1.jdk ~/frc2020
   
-	cp -R ~/Downloads/WPILib_Mac-2019.1.1/maven ~/frc2019
+	cp -R ~/Downloads/WPILib_Mac-2020.1.2/maven ~/frc2020
   
-	cp -R ~/Downloads/WPILib_Mac-2019.1.1/roborio ~/frc2019
+	cp -R ~/Downloads/WPILib_Mac-2020.1.2/roborio ~/frc2020
   
-	cp -R ~/Downloads/WPILib_Mac-2019.1.1/tools ~/frc2019
+	cp -R ~/Downloads/WPILib_Mac-2020.1.2/tools ~/frc2020
   
-	cp -R ~/Downloads/WPILib_Mac-2019.1.1/utility ~/frc2019
+	cp -R ~/Downloads/WPILib_Mac-2020.1.2/utility ~/frc2020
   
-	cp -R ~/Downloads/WPILib_Mac-2019.1.1/vsCodeExtensions ~/frc2019
+	cp -R ~/Downloads/WPILib_Mac-2020.1.2/vsCodeExtensions ~/frc2020
   ```
   
   (Run `ls` to make sure all the folders(direcotries) copied over)
 	
- h. Now run `cd ~/frc2019/tools`
+ h. Now run `cd ~/frc2020/tools`
  
  i. Run `python ToolsUpdater.py` which runs the ToolsUpdater script.
  
@@ -77,7 +91,7 @@ https://github.com/wpilibsuite/allwpilib/releases
  
  n. In the Finder prompt, locate the dropdown menu in the center of the window at the top and select the home icon/emoji.
  
- o. Then open the folder frc2019, then vsCodeExtensions.
+ o. Then open the folder frc2020, then vsCodeExtensions.
  
  p.Select `Cpp.vsix` and then Install.
  
@@ -144,21 +158,21 @@ a. To start, make a folder somewhere to store your robot code, then open termina
 
 `cd "Destination of Folder`
 
-Ex(Windows). `cd Desktop/FRC_2019`
+Ex(Windows). `cd Desktop/FRC_2020`
 
-ex(MacOs). `cd /Desktop/FRC_2019`
+ex(MacOs). `cd /Desktop/FRC_2020`
 
 b. Now you need to clone the repositry into the folder(like copy and pasting).
 
-`git clone https://github.com/frc604/FRC-2019.git`
+`git clone https://github.com/frc604/FRC-2020.git`
 
-c. Now go into Visual Studio COde and click `File -> Open Folder` and click on the folder `FRC-2019` in the folder that you created.
+c. Now go into Visual Studio COde and click `File -> Open Folder` and click on the folder `FRC-2020` in the folder that you created.
 
 ## Pulling Certain Branch
 
-a. `cd` into the the code repo, into the folder you made, then into FRC-2019
+a. `cd` into the the code repo, into the folder you made, then into FRC-2020
 
-`cd "Folder Path/FRC-2019"`
+`cd "Folder Path/FRC-2020"`
 
 b. Then type `git fetch` -v to list all the possibble branches.
 
@@ -205,10 +219,13 @@ Uses Pixy code adapted from [BHSRobotix/Steamworks2017](https://github.com/BHSRo
 
 2. Next open Shuffleboard and click `File -> Open Layout`
 
-3. In the prompt locate your reposoirity location and select the `shuffleboard_FRC-2019.json` file in the `ShuffleboardFiles` folder.
+3. In the prompt locate your reposoirity location and select the `shuffleboard_FRC-2020.json` file in the `ShuffleboardFiles` folder.
 
 ## Limelight
 ### Flashing
 When flashing the Limelight, follow the instructions found [here](http://docs.limelightvision.io/en/latest/getting_started.html#imaging).
 However, it is also nessessary to install the drivers for a Raspberry Pi compute module as well.
 You will know you have succeeded when the Pi shows up as a removable drive (if on Windows).
+
+## Drivers
+http://www.sapphiretech.com/product_downloadmore.asp?PID=1482&CataID=30&lang=eng

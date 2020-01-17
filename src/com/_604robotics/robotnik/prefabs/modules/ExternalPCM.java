@@ -2,7 +2,6 @@ package com._604robotics.robotnik.prefabs.modules;
 
 import com._604robotics.robotnik.Module;
 import com._604robotics.robotnik.Output;
-
 import edu.wpi.first.wpilibj.Compressor;
 
 public class ExternalPCM extends Module {
@@ -15,8 +14,9 @@ public class ExternalPCM extends Module {
 
     compressor = new Compressor(compPort);
 
-    compCurrent = addOutput("Compressor" + Integer.toString(compPort) + "Current", () -> compressor.getCompressorCurrent());
+    compCurrent =
+        addOutput(
+            "Compressor" + Integer.toString(compPort) + "Current",
+            () -> compressor.getCompressorCurrent());
   }
-
-
 }

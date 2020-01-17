@@ -9,8 +9,7 @@
 
 package com._604robotics.robotnik.prefabs.controller;
 
-import java.util.TimerTask;
-import java.util.concurrent.locks.ReentrantLock;
+import static java.util.Objects.requireNonNull;
 
 import edu.wpi.first.hal.FRCNetComm;
 import edu.wpi.first.hal.HAL;
@@ -24,8 +23,8 @@ import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.filters.LinearDigitalFilter;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-
-import static java.util.Objects.requireNonNull;
+import java.util.TimerTask;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Class implements a PID Control Loop.
@@ -37,18 +36,19 @@ import static java.util.Objects.requireNonNull;
  * and derivative calculations. Therefore, the sample rate affects the controller's behavior for a
  * given set of PID constants.
  */
-
+@Deprecated
 public class ExtendablePIDController extends SendableBase implements PIDInterface, Sendable {
   public static final double kDefaultPeriod = .05;
   private static int instances = 0;
-  @SuppressWarnings("MemberName")
+
   private double m_P; // factor for "proportional" control
-  @SuppressWarnings("MemberName")
+
   private double m_I; // factor for "integral" control
-  @SuppressWarnings("MemberName")
+
   private double m_D; // factor for "derivative" control
-  @SuppressWarnings("MemberName")
+
   private double m_F; // factor for feedforward term
+
   private double m_maximumOutput = 1.0; // |maximum output|
   private double m_minimumOutput = -1.0; // |minimum output|
   protected double m_maximumInput = 0.0; // maximum input - limit setpoint to this
@@ -65,8 +65,10 @@ public class ExtendablePIDController extends SendableBase implements PIDInterfac
   private Tolerance m_tolerance;
   private double m_setpoint = 0.0;
   private double m_prevSetpoint = 0.0;
-  @SuppressWarnings("PMD.UnusedPrivateField")
+
+  @SuppressWarnings("unused")
   private double m_error = 0.0;
+
   private double m_result = 0.0;
   private double m_period = kDefaultPeriod;
 
@@ -94,9 +96,7 @@ public class ExtendablePIDController extends SendableBase implements PIDInterfac
     boolean onTarget();
   }
 
-  /**
-   * Used internally for when Tolerance hasn't been set.
-   */
+  /** Used internally for when Tolerance hasn't been set. */
   public class NullTolerance implements Tolerance {
     @Override
     public boolean onTarget() {
@@ -148,18 +148,23 @@ public class ExtendablePIDController extends SendableBase implements PIDInterfac
   /**
    * Allocate a PID object with the given constants for P, I, D, and F.
    *
-   * @param Kp     the proportional coefficient
-   * @param Ki     the integral coefficient
-   * @param Kd     the derivative coefficient
-   * @param Kf     the feed forward term
+   * @param Kp the proportional coefficient
+   * @param Ki the integral coefficient
+   * @param Kd the derivative coefficient
+   * @param Kf the feed forward term
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output percentage
    * @param period the loop time for doing calculations. This particularly effects calculations of
-   *               the integral and differential terms. The default is 50ms.
+   *     the integral and differential terms. The default is 50ms.
    */
-  @SuppressWarnings("ParameterName")
-  public ExtendablePIDController(double Kp, double Ki, double Kd, double Kf, PIDSource source,
-                       PIDOutput output, double period) {
+  public ExtendablePIDController(
+      double Kp,
+      double Ki,
+      double Kd,
+      double Kf,
+      PIDSource source,
+      PIDOutput output,
+      double period) {
     super(false);
     requireNonNull(source, "Null PIDSource was given");
     requireNonNull(output, "Null PIDOutput was given");
@@ -185,11 +190,14 @@ public class ExtendablePIDController extends SendableBase implements PIDInterfac
 
     m_controlLoop.schedule(new PIDTask(this), 0L, (long) (m_period * 1000));
 
-    // This is used for specific debugging. When in doubt, check the offical PIDController class from WPILib
-    // Possibly due to WPILib being in Cpp and Java, so a debugger written for Cpp would need to have Java linked
-    // through JNI to have said theoretical debugger work properly. Or maybe that's just completely wrong.
+    // This is used for specific debugging. When in doubt, check the offical PIDController class
+    // from WPILib
+    // Possibly due to WPILib being in Cpp and Java, so a debugger written for Cpp would need to
+    // have Java linked
+    // through JNI to have said theoretical debugger work properly. Or maybe that's just completely
+    // wrong.
     instances++;
-    HAL.report( FRCNetComm.tResourceType.kResourceType_PIDController, instances);
+    HAL.report(FRCNetComm.tResourceType.kResourceType_PIDController, instances);
     m_tolerance = new NullTolerance();
     setName("PIDController", instances);
   }
@@ -197,72 +205,52 @@ public class ExtendablePIDController extends SendableBase implements PIDInterfac
   /**
    * Allocate a PID object with the given constants for P, I, D and period.
    *
-   * @param Kp     the proportional coefficient
-   * @param Ki     the integral coefficient
-   * @param Kd     the derivative coefficient
+   * @param Kp the proportional coefficient
+   * @param Ki the integral coefficient
+   * @param Kd the derivative coefficient
    * @param source the PIDSource object that is used to get values
    * @param output the PIDOutput object that is set to the output percentage
    * @param period the loop time for doing calculations. This particularly effects calculations of
-   *               the integral and differential terms. The default is 50ms.
+   *     the integral and differential terms. The default is 50ms.
    */
-  @SuppressWarnings("ParameterName")
-  public ExtendablePIDController(double Kp, double Ki, double Kd, PIDSource source, PIDOutput output,
-                       double period) {
+  public ExtendablePIDController(
+      double Kp, double Ki, double Kd, PIDSource source, PIDOutput output, double period) {
     this(Kp, Ki, Kd, 0.0, source, output, period);
   }
 
   /**
    * Allocate a PID object with the given constants for P, I, D, using a 50ms period.
    *
-   * @param Kp     the proportional coefficient
-   * @param Ki     the integral coefficient
-   * @param Kd     the derivative coefficient
+   * @param Kp the proportional coefficient
+   * @param Ki the integral coefficient
+   * @param Kd the derivative coefficient
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output percentage
    */
-  @SuppressWarnings("ParameterName")
-  public ExtendablePIDController(double Kp, double Ki, double Kd, PIDSource source, PIDOutput output) {
+  public ExtendablePIDController(
+      double Kp, double Ki, double Kd, PIDSource source, PIDOutput output) {
     this(Kp, Ki, Kd, source, output, kDefaultPeriod);
   }
 
   /**
    * Allocate a PID object with the given constants for P, I, D, using a 50ms period.
    *
-   * @param Kp     the proportional coefficient
-   * @param Ki     the integral coefficient
-   * @param Kd     the derivative coefficient
-   * @param Kf     the feed forward term
+   * @param Kp the proportional coefficient
+   * @param Ki the integral coefficient
+   * @param Kd the derivative coefficient
+   * @param Kf the feed forward term
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output percentage
    */
-  @SuppressWarnings("ParameterName")
-  public ExtendablePIDController(double Kp, double Ki, double Kd, double Kf, PIDSource source,
-                       PIDOutput output) {
+  public ExtendablePIDController(
+      double Kp, double Ki, double Kd, double Kf, PIDSource source, PIDOutput output) {
     this(Kp, Ki, Kd, Kf, source, output, kDefaultPeriod);
-  }
-
-  /**
-   * Free the PID object.
-   */
-  @Override
-  public void free() {
-    super.free();
-    m_controlLoop.cancel();
-    m_thisMutex.lock();
-    try {
-      m_pidOutput = null;
-      m_pidInput = null;
-      m_controlLoop = null;
-    } finally {
-      m_thisMutex.unlock();
-    }
   }
 
   /**
    * Read the input, calculate the output accordingly, and write to the output. This should only be
    * called by the PIDTask and is created during initialization.
    */
-  @SuppressWarnings("LocalVariableName")
   protected void calculate() {
     if (m_origSource == null || m_pidOutput == null) {
       return;
@@ -315,23 +303,24 @@ public class ExtendablePIDController extends SendableBase implements PIDInterfac
       // Storage for function outputs
       double result;
 
-      error=modifyError(error);
+      error = modifyError(error);
 
       if (pidSourceType.equals(PIDSourceType.kRate)) {
         if (P != 0) {
-          totalError=modifyTotalError(totalError + error);
+          totalError = modifyTotalError(totalError + error);
         }
 
         result = calculateProportional(P, totalError) + calculateDerivative(D, error) + feedForward;
       } else {
         if (I != 0) {
-          totalError=modifyTotalError(totalError + error);
+          totalError = modifyTotalError(totalError + error);
         }
 
-        result = calculateProportional(P, error)
-               + calculateIntegral(I, totalError)
-               + calculateDerivative(D, (error - prevError))
-            + feedForward;
+        result =
+            calculateProportional(P, error)
+                + calculateIntegral(I, totalError)
+                + calculateDerivative(D, (error - prevError))
+                + feedForward;
       }
 
       result = clamp(result, minimumOutput, maximumOutput);
@@ -367,43 +356,46 @@ public class ExtendablePIDController extends SendableBase implements PIDInterfac
       }
     }
   }
-  
+
   /**
-   * Method that modifies the error before feeding into the PID calculation.
-   * The default passses the error through unchanged
+   * Method that modifies the error before feeding into the PID calculation. The default passses the
+   * error through unchanged
+   *
    * @param error the input error
    * @return the modified error
    */
   protected synchronized double modifyError(double error) {
     return error;
   }
-  
+
   /**
-   * Method that modifies the error sum before feeding into the PID calculation.
-   * The default is to clamp the value to the min and max allowable output.
+   * Method that modifies the error sum before feeding into the PID calculation. The default is to
+   * clamp the value to the min and max allowable output.
+   *
    * @param totalError the input totalError
    * @return the modified totalError
    */
   protected synchronized double modifyTotalError(double totalError) {
     double divparam;
-    double min,max;
+    double min, max;
     m_thisMutex.lock();
     try {
       if (m_pidInput.getPIDSourceType().equals(PIDSourceType.kRate)) {
-          divparam = m_P;
+        divparam = m_P;
       } else {
-          divparam = m_I;
+        divparam = m_I;
       }
-      min=m_minimumOutput;
-      max=m_maximumOutput;
+      min = m_minimumOutput;
+      max = m_maximumOutput;
     } finally {
       m_thisMutex.unlock();
     }
     return clamp(totalError, min / divparam, max / divparam);
   }
-  
+
   /**
    * Method to directly set the integral sum
+   *
    * @param sum the sum to set
    */
   public synchronized void setErrorSum(double sum) {
@@ -414,26 +406,26 @@ public class ExtendablePIDController extends SendableBase implements PIDInterfac
       m_thisMutex.unlock();
     }
   }
-  
+
   protected synchronized double calculateProportional(double p, double error) {
-    return p*error;
+    return p * error;
   }
-  
+
   protected synchronized double calculateIntegral(double i, double totalerror) {
-    return i*totalerror;
+    return i * totalerror;
   }
-  
+
   protected synchronized double calculateDerivative(double d, double derror) {
-    return d*derror;
+    return d * derror;
   }
 
   /**
    * Calculate the feed forward term.
    *
    * <p>Both of the provided feed forward calculations are velocity feed forwards. If a different
-   * feed forward calculation is desired, the user can override this function and provide his or
-   * her own. This function  does no synchronization because the PIDController class only calls it
-   * in synchronized code, so be careful if calling it oneself.
+   * feed forward calculation is desired, the user can override this function and provide his or her
+   * own. This function does no synchronization because the PIDController class only calls it in
+   * synchronized code, so be careful if calling it oneself.
    *
    * <p>If a velocity PID controller is being used, the F term should be set to 1 over the maximum
    * setpoint for the output. If a position PID controller is being used, the F term should be set
@@ -459,7 +451,6 @@ public class ExtendablePIDController extends SendableBase implements PIDInterfac
    * @param i Integral coefficient
    * @param d Differential coefficient
    */
-  @SuppressWarnings("ParameterName")
   public void setPID(double p, double i, double d) {
     m_thisMutex.lock();
     try {
@@ -480,7 +471,6 @@ public class ExtendablePIDController extends SendableBase implements PIDInterfac
    * @param d Differential coefficient
    * @param f Feed forward coefficient
    */
-  @SuppressWarnings("ParameterName")
   public void setPID(double p, double i, double d, double f) {
     m_thisMutex.lock();
     try {
@@ -498,7 +488,6 @@ public class ExtendablePIDController extends SendableBase implements PIDInterfac
    *
    * @param p Proportional coefficient
    */
-  @SuppressWarnings("ParameterName")
   public void setP(double p) {
     m_thisMutex.lock();
     try {
@@ -513,7 +502,6 @@ public class ExtendablePIDController extends SendableBase implements PIDInterfac
    *
    * @param i Integral coefficient
    */
-  @SuppressWarnings("ParameterName")
   public void setI(double i) {
     m_thisMutex.lock();
     try {
@@ -528,7 +516,6 @@ public class ExtendablePIDController extends SendableBase implements PIDInterfac
    *
    * @param d differential coefficient
    */
-  @SuppressWarnings("ParameterName")
   public void setD(double d) {
     m_thisMutex.lock();
     try {
@@ -543,7 +530,6 @@ public class ExtendablePIDController extends SendableBase implements PIDInterfac
    *
    * @param f feed forward coefficient
    */
-  @SuppressWarnings("ParameterName")
   public void setF(double f) {
     m_thisMutex.lock();
     try {
@@ -762,7 +748,7 @@ public class ExtendablePIDController extends SendableBase implements PIDInterfac
    * used for the onTarget() function.
    *
    * @deprecated Use getError(), which is now already filtered.
-   * @return     the current average of the error
+   * @return the current average of the error
    */
   @Deprecated
   public double getAvgError() {
@@ -798,9 +784,9 @@ public class ExtendablePIDController extends SendableBase implements PIDInterfac
    * object. Use it by creating the type of tolerance that you want to use: setTolerance(new
    * PIDController.AbsoluteTolerance(0.1))
    *
-   * @deprecated      Use setPercentTolerance() instead.
+   * @deprecated Use setPercentTolerance() instead.
    * @param tolerance A tolerance object of the right type, e.g. PercentTolerance or
-   *                  AbsoluteTolerance
+   *     AbsoluteTolerance
    */
   @Deprecated
   public void setTolerance(Tolerance tolerance) {
@@ -843,7 +829,7 @@ public class ExtendablePIDController extends SendableBase implements PIDInterfac
    * erroneous measurements when the mechanism is on target. However, the mechanism will not
    * register as on target for at least the specified bufLength cycles.
    *
-   * @deprecated      Use a LinearDigitalFilter as the input.
+   * @deprecated Use a LinearDigitalFilter as the input.
    * @param bufLength Number of previous cycles to average.
    */
   @Deprecated
@@ -872,9 +858,7 @@ public class ExtendablePIDController extends SendableBase implements PIDInterfac
     }
   }
 
-  /**
-   * Begin running the PIDController.
-   */
+  /** Begin running the PIDController. */
   private void enable() {
     m_thisMutex.lock();
     try {
@@ -884,9 +868,7 @@ public class ExtendablePIDController extends SendableBase implements PIDInterfac
     }
   }
 
-  /**
-   * Stop running the PIDController, this sets the output to zero before stopping.
-   */
+  /** Stop running the PIDController, this sets the output to zero before stopping. */
   private void disable() {
     // Ensures m_enabled check and pidWrite() call occur atomically
     m_pidWriteMutex.lock();
@@ -904,9 +886,7 @@ public class ExtendablePIDController extends SendableBase implements PIDInterfac
     }
   }
 
-  /**
-   * Set the enabled state of the PIDController.
-   */
+  /** Set the enabled state of the PIDController. */
   public void setEnabled(boolean enable) {
     if (enable) {
       enable();
@@ -915,9 +895,7 @@ public class ExtendablePIDController extends SendableBase implements PIDInterfac
     }
   }
 
-  /**
-   * Return true if PIDController is enabled.
-   */
+  /** Return true if PIDController is enabled. */
   private boolean isEnabled() {
     m_thisMutex.lock();
     try {
@@ -927,9 +905,7 @@ public class ExtendablePIDController extends SendableBase implements PIDInterfac
     }
   }
 
-  /**
-   * Reset the previous error,, the integral term, and disable the controller.
-   */
+  /** Reset the previous error,, the integral term, and disable the controller. */
   @Override
   public void reset() {
     disable();
